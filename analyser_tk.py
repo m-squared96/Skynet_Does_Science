@@ -48,9 +48,16 @@ class HomePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        label = tk.Label(self, text="It Works!").pack()
+        label = tk.Label(self, text="Enter the filename (and path) in the textbox below").pack()
+
+        self.filename = tk.StringVar()
+        filename_entry = tk.Entry(self, textvariable=self.filename).pack()
 
         button = tk.Button(self, text="Dummy Page", command=lambda: controller.resolve(DummyPage)).pack()
+        submit_button = tk.Button(self, text="Submit data for Analysis", command=self.submit_button_command).pack()
+
+    def submit_button_command(self):
+        print(pd.read_csv(self.filename.get()))
 
 #Just a demo page
 class DummyPage(tk.Frame):
