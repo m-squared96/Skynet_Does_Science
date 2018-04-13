@@ -53,11 +53,17 @@ class HomePage(tk.Frame):
         self.filename = tk.StringVar()
         filename_entry = tk.Entry(self, textvariable=self.filename).pack()
 
-        button = tk.Button(self, text="Dummy Page", command=lambda: controller.resolve(DummyPage)).pack()
-        submit_button = tk.Button(self, text="Submit data for Analysis", command=self.submit_button_command).pack()
+        submit_button = tk.Button(self, text="Submit data for Viewing", command=self.submit_button_command).pack()
 
     def submit_button_command(self):
-        print(pd.read_csv(self.filename.get()))
+        self.filehandler()
+
+    def filehandler(self):
+        self.filename_str = self.filename.get()
+        self.file_ext = self.filename_str[self.filename_str.index("."):]
+
+        print(self.file_ext)
+        
 
 #Just a demo page
 class DummyPage(tk.Frame):
@@ -71,4 +77,5 @@ class DummyPage(tk.Frame):
 
 #Calls app
 mainrun = AnalysisApp()
+mainrun.geometry("400x300")
 mainrun.mainloop()
