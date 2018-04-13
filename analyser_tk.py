@@ -57,6 +57,10 @@ class DummyPage(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        
+        label = tk.Label(self, text="Dummy").pack()
+
+        button = tk.Button(self, text="Go Home", command=lambda: controller.resolve(HomePage)).pack()
 
 #Calls app
 mainrun = AnalysisApp()
