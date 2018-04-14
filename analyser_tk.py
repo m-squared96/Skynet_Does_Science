@@ -13,6 +13,7 @@ import pandas as pd
 
 import tkinter as tk
 from tkinter import ttk
+from tkinter.filedialog import askopenfilename
 
 #Parent class for the GUI
 class AnalysisApp(tk.Tk):
@@ -50,23 +51,55 @@ class HomePage(tk.Frame):
 
         label = tk.Label(self, text="Enter the filename (and path) in the textbox below").pack()
 
+        #Initialising entry box and associated dependencies
         self.filename = tk.StringVar()
         filename_entry = tk.Entry(self, textvariable=self.filename).pack()
 
         submit_button = tk.Button(self, text="Submit data for Viewing", command=self.submit_button_command).pack()
 
+        or_label = tk.Label(self, text="OR").pack(pady=10)
+
+        browse_button = tk.Button(self, text="Browse", command=lambda: self.file_browser()).pack()
+
+    #Currently primitive function that will expand as app becomes more complex
+    #Will decide which analysis function to use etc, will become far more relevant
+    #with inclusion of .FITS files
     def submit_button_command(self):
         self.filehandler()
 
+    #Graphical filesystem browser that allows the user to choose a file using a GUI
+    def file_browser(self):
+        self.filename = askopenfilename(initialdir="mikie/home/Programming", 
+                                filetypes =(("All Files","*.*"),("Text File", "*.txt"),("CSV File", "*.csv"),("Excel File", "*.xlsx")),
+                                title = "Choose a file."
+                            )
+        #Allowing for mistakes in file specification
+        try:
+            self.submit_button_command()
+        except:
+            print("No file exists")
+
+    #Branching function that allows relevant analysis functions to be called
     def filehandler(self):
-        self.filename_str = self.filename.get()
+
+        #Allowing for user-input text from textbox
+        if type(self.filename) == tk.StringVar:
+            self.filename_str = self.filename.get()
+
+        #Handling File Browser input
+        else:
+            self.filename_str = self.filename
+
+        #Identifying file extension
         self.file_ext = self.filename_str[self.filename_str.index("."):]
 
+        #List of currently supported file types
         self.supported_types = [".csv", ".txt", ".xlsx"]
 
         if self.file_ext not in self.supported_types:
             print("Unsupported File Type")
 
+        #If file type is supported, will call relevant analysis function
         else:
             if self.file_ext == ".csv":
                 self.csv_handler()
@@ -83,6 +116,7 @@ class HomePage(tk.Frame):
 
     def txt_handler(self):
         data = pd.read_csv(self.filename_str, sep="\t")
+        print(data)
 
     def xlsx_handler(self):
         data = pd.read_excel(self.filename_str)
