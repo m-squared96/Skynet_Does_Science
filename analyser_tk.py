@@ -62,8 +62,30 @@ class HomePage(tk.Frame):
         self.filename_str = self.filename.get()
         self.file_ext = self.filename_str[self.filename_str.index("."):]
 
-        print(self.file_ext)
-        
+        self.supported_types = [".csv", ".txt", ".xlsx"]
+
+        if self.file_ext not in self.supported_types:
+            print("Unsupported File Type")
+
+        else:
+            if self.file_ext == ".csv":
+                self.csv_handler()
+            
+            elif self.file_ext == ".txt":
+                self.txt_handler()
+
+            elif self.file_ext == ".xlsx":
+                self.xlsx_handler()
+
+    def csv_handler(self):
+        data = pd.read_csv(self.filename_str)
+        print(data)
+
+    def txt_handler(self):
+        data = pd.read_csv(self.filename_str, sep="\t")
+
+    def xlsx_handler(self):
+        data = pd.read_excel(self.filename_str)
 
 #Just a demo page
 class DummyPage(tk.Frame):
