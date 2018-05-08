@@ -34,19 +34,31 @@ class AnalysisApp(tk.Tk):
             frame = page(container, self)
             self.frames[page] = frame
             frame.grid(row=0, column=0, sticky="nsew")
-        
+
         #Calls the HomePage to be displayed
         self.resolve(HomePage)
-    
+
     #Takes a page as an argument and displays it
     def resolve(self, page_container):
         frame = self.frames[page_container]
         frame.tkraise()
 
+    #Displays a popup message to notify user of an error
+    def warning_popup(self, text):
+        popup = tk.Toplevel(self)
+
+        popup.geometry("200x100")
+
+        label = tk.Label(popup, text=text).pack(pady=10)
+        dismiss_button = tk.Button(popup, text="Dismiss", command=lambda: popup.destroy()).pack()
+
 #Initial page user will interact with
 class HomePage(tk.Frame):
 
     def __init__(self, parent, controller):
+
+        self.controller = controller
+
         tk.Frame.__init__(self, parent)
 
         label = tk.Label(self, text="Enter the filename (and path) in the textbox below").pack()
@@ -69,7 +81,7 @@ class HomePage(tk.Frame):
 
     #Graphical filesystem browser that allows the user to choose a file using a GUI
     def file_browser(self):
-        self.filename = askopenfilename(initialdir="mikie/home/Programming", 
+        self.filename = askopenfilename(initialdir="mikie/home/Programming",
                                 filetypes =(("All Files","*.*"),("Text File", "*.txt"),("CSV File", "*.csv"),("Excel File", "*.xlsx")),
                                 title = "Choose a file."
                             )
@@ -77,7 +89,7 @@ class HomePage(tk.Frame):
         try:
             self.submit_button_command()
         except:
-            print("No file exists")
+            self.controller.warning_popup("No file exists")
 
     #Branching function that allows relevant analysis functions to be called
     def filehandler(self):
@@ -91,24 +103,28 @@ class HomePage(tk.Frame):
             self.filename_str = self.filename
 
         #Identifying file extension
-        self.file_ext = self.filename_str[self.filename_str.index("."):]
+        try:
+            self.file_ext = self.filename_str[self.filename_str.index("."):]
 
-        #List of currently supported file types
-        self.supported_types = [".csv", ".txt", ".xlsx"]
+            #List of currently supported file types
+            self.supported_types = [".csv", ".txt", ".xlsx"]
 
-        if self.file_ext not in self.supported_types:
-            print("Unsupported File Type")
+            if self.file_ext not in self.supported_types:
+                self.controller.warning_popup("Unsupported File Type")
 
-        #If file type is supported, will call relevant analysis function
-        else:
-            if self.file_ext == ".csv":
-                self.csv_handler()
-            
-            elif self.file_ext == ".txt":
-                self.txt_handler()
+            #If file type is supported, will call relevant analysis function
+            else:
+                if self.file_ext == ".csv":
+                    self.csv_handler()
 
-            elif self.file_ext == ".xlsx":
-                self.xlsx_handler()
+                elif self.file_ext == ".txt":
+                    self.txt_handler()
+
+                elif self.file_ext == ".xlsx":
+                    self.xlsx_handler()
+
+        except ValueError:
+            self.controller.warning_popup("Not a file")
 
     def csv_handler(self):
         data = pd.read_csv(self.filename_str)
@@ -126,7 +142,7 @@ class DummyPage(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        
+
         label = tk.Label(self, text="Dummy").pack()
 
         button = tk.Button(self, text="Go Home", command=lambda: controller.resolve(HomePage)).pack()
