@@ -52,6 +52,17 @@ class AnalysisApp(tk.Tk):
         label = tk.Label(popup, text=text).pack(pady=10)
         dismiss_button = tk.Button(popup, text="Dismiss", command=lambda: popup.destroy()).pack()
 
+    def csv_handler(self, filename):
+        data = pd.read_csv(filename)
+        print(data)
+
+    def txt_handler(self, filename):
+        data = pd.read_csv(filename, sep="\t")
+        print(data)
+
+    def xlsx_handler(self, filename):
+        data = pd.read_excel(filename)
+
 #Initial page user will interact with
 class HomePage(tk.Frame):
 
@@ -96,15 +107,15 @@ class HomePage(tk.Frame):
 
         #Allowing for user-input text from textbox
         if type(self.filename) == tk.StringVar:
-            self.filename_str = self.filename.get()
+            filename_str = self.filename.get()
 
         #Handling File Browser input
         else:
-            self.filename_str = self.filename
+            filename_str = self.filename
 
         #Identifying file extension
         try:
-            self.file_ext = self.filename_str[self.filename_str.index("."):]
+            self.file_ext = filename_str[filename_str.index("."):]
 
             #List of currently supported file types
             self.supported_types = [".csv", ".txt", ".xlsx"]
@@ -115,27 +126,16 @@ class HomePage(tk.Frame):
             #If file type is supported, will call relevant analysis function
             else:
                 if self.file_ext == ".csv":
-                    self.csv_handler()
+                    self.controller.csv_handler(filename_str)
 
                 elif self.file_ext == ".txt":
-                    self.txt_handler()
+                    self.controller.txt_handler(filename_str)
 
                 elif self.file_ext == ".xlsx":
-                    self.xlsx_handler()
+                    self.controller.xlsx_handler(filename_str)
 
         except ValueError:
             self.controller.warning_popup("Not a file")
-
-    def csv_handler(self):
-        data = pd.read_csv(self.filename_str)
-        print(data)
-
-    def txt_handler(self):
-        data = pd.read_csv(self.filename_str, sep="\t")
-        print(data)
-
-    def xlsx_handler(self):
-        data = pd.read_excel(self.filename_str)
 
 #Just a demo page
 class DummyPage(tk.Frame):
